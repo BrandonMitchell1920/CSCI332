@@ -1,0 +1,94 @@
+%%
+% CSCI332 Design and Analysis of Algorithms
+%
+% Quickhull - Divide and Conquer 
+%
+% Phillip J. Curtiss, Associate Professor
+% pcurtiss@mtech.edu, 406-96-4807
+% Department of Computer Science, Montana Tech
+%%
+\documentclass[letterpaper,10pt,english]{article}
+
+%%
+% Required packages - for encoding fonts and input
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+%%
+% Adjust Geometry of document pages
+\usepackage[margin=1in]{geometry}
+
+%%
+% Let's make it easier to use math
+\usepackage{amsmath,amsfonts,amssymb}
+
+%%
+% Add some color packages and allow use of images
+\usepackage{xcolor,graphicx}
+
+%%
+% Ease adjusting line spacing and adjust paragraph format
+\usepackage{setspace}
+\usepackage[parfill]{parskip}
+
+\begin{document}
+
+\begin{flushleft}
+  Mathematics used in the Quickhull Project \hfill Phillip J. Curtiss, Associate Professor\\
+  CSCI332 Design and Analysis of Algorithms \hfill Department of Computer Science, Montana Tech \\[1em]
+  \hrule
+\end{flushleft}
+
+The \emph{Quickhull} algorithm finds the points in $\Re^{2}$, from a collection of $n$ points provided, that form a \emph{convex hull} - that is a regular polygon that \emph{encloses} the provided points that do not form the convex hull. 
+
+The algorithm accomplishes this through using a \emph{divide and conquer} strategy whereby: 
+
+\begin{itemize}
+  \item the $n$ points provided are sorted based on the value of their x-coordinate
+  \item it finds the extreme points $P_{1}$ and $P_{n}$ by examining the x-coordinate of all the provided points - these points will form the starting points of the convex hull. Any points co-linear with this line segment and not the end-points will not be part of the convex hull. 
+  \item this line segment divides the remaining set of points into two (2) groups, a group of points ``to the left'' of the line segment (upper hull), and a set of points ``to the right'' of the line segment (lower hull). The two sets of points can now be treated in exactly the same manner for further dividing the problem into smaller instances:
+  \begin{itemize}
+    \item in the upper hull, locate a point $P_{max}$ such that its distance from the line $\overrightarrow{P_{1}P_{n}}$ is the largest. This forms a triangle from the line segments $\overrightarrow{P_{1}P_{max}}$, $\overrightarrow{P_{max}P_{n}}$, and $\overrightarrow{P_{1}P_{n}}$ or $\triangle P_{1}P_{max}P_{n}$, such that points in the interior of this triangle cannot be point lying on the convex hull.
+    \item Each of these new line segments that in the point $P_{max}$ will further divide the set of points in the upper hull into two smaller groups of points. The same procedure is done in this new smaller upper and smaller lower hull until there are no points in the upper hull of such a division. 
+    \item When this occurs, the points forming the line segment $\overrightarrow{P_{1}P_{max}}$ for the specific smaller instance of the problem must be points on the convex hull. 
+  \end{itemize}
+  \item The procedure of dividing and locating points forming the convex hull continues until there are no more points to divide, resulting in a set of points comprising the convex hull for the original instance of the problem. 
+\end{itemize}
+
+\paragraph{Computing Leftness or Rightness} ~
+
+Whether a point is to the left or right of a line segment can be formally computed by considering the sign of the \emph{determinant} of the three (3) points - the two end points of the line segment, and the third candidate point. Given three points $q_{1}(x_{1}, y_{1})$, $q_{2}(x_{2},y_{2})$, and $q_{3}(x_{3},y_{3})$ each in $\Re^{2}$, one can compute the determinant by forming a matrix of the coordinates such that the first column has the x-coordinates for the three points, the second column has the y-coordinates for the three points, and the last column has all 1s, as follow:
+
+\begin{align*}
+ 2S = \begin{vmatrix}
+    x_{1} & y_{1} & 1 \\
+    x_{2} & y_{2} & 1 \\
+    x_{3} & y_{3} & 1
+  \end{vmatrix}
+  &= x_{1} \cdot [(y_{2} \cdot     1) - (1     \cdot y_{3})] - 
+     y_{1} \cdot [(x_{2} \cdot     1) - (1     \cdot x_{3})] +
+         1 \cdot [(x_{2} \cdot y_{3}) - (y_{2} \cdot x_{3})] \\
+    &= x_{1}y_{2} - x_{1}y_{3} - y_{1}x_{2} + y_{1}x_{3} + x_{2}y_{3} - y_{2}x_{3} \\
+    &= x_{1}y_{2} + x_{2}y_{3} + x_{3}y_{1} - x_{1}y_{3} - x_{2}y_{1} -x_{3}y_{2} \\
+    &= (y_{3} - y_{1}) \cdot (x_{2} - x_{1}) - (y_{2} - y_{1}) \cdot (x_{3} - x_{1})
+\end{align*}
+
+Where $S$ is the area of the triangle formed by the points $q_{1}$, $q_{2}$, and $q_{3}$. If $S > 0$,  then the point $q_{3}(x_{3},y_{3})$ is to the left of the line segment $\overrightarrow{q_{1}q_{2}}$.
+
+\paragraph{Computing the Distance} ~
+
+Once you have the area, $S$, of the triangle formed by three points, $\triangle q_{1}q_{2}q_{3}$, the magnitude of the area must also be equal to $\frac{1}{2} b h$ of the right angle formed by the normal projection of point $q_{3}$ onto the line segment $\overrightarrow{q_{1}q_{2}}$. Therefore, $h = 2S/b$, with $h$ being the shortest distance from $q_{3}(x_{3},y_{3})$ to the line segment $\overrightarrow{q_{1}q_{2}}$. The base, $b$, is just the distance between the two points $q_{1}$ an $q_{2}$, or $b = \sqrt{(x_{2} - x_{1})^{2} + (y_{2} - y_{1})^{2}}$. 
+
+Therefore, the distance for $q_{3}$ to the line segment $\overrightarrow{q_{1}q_{2}}$ is given by, 
+\[
+  h = \left|\left| \frac{(y_{3} - y_{1}) \cdot (x_{2} - x_{1}) - (y_{2} - y_{1}) \cdot (x_{3} - x_{1})}
+           {\sqrt{(x_{2} - x_{1})^{2} + (y_{2} - y_{1})^{2}}} \right|\right|
+\]
+
+\paragraph{Concluding Remarks} ~
+
+Even though you will need some way to determine if a given point is on the ``left'' side of a line segment dividing the upper and lower hulls for each instance, you are not required to use the method described here. Similarly, in terms of finding the maximum point away from the line segment dividing the upper and lower hulls for each instance, you are not required to use the method described herein. 
+
+Which ever method you use, make sure you prove that the methodology is going to work with the information provided at each smaller instance of the \emph{quickhull} algorithm and does not depend on information that is not tracked by the algorithm. 
+
+\end{document}

@@ -1,0 +1,88 @@
+
+
+@startuml
+
+hide empty methods
+hide empty attributes
+skinparam classAttributeIconSize 0
+set namespaceSeparator ::
+
+left  header 
+    UML Class Diagram for Quickhull
+    CSCI 332 Design & Analysis of Algorithms
+end header
+
+right footer 
+    Department of Computer Science, Montana Technological University
+end footer
+
+class std::tuple<T>
+class std::string<T>
+class std::vector<T>
+class std::set<T>
+class std::ostream<T>
+
+class Point<class T> {
+    Represents a Point in 2D, each coord is of type T
+    ==
+    -x : T
+    -y : T
+    __
+    +Point() : Point<T>
+    +Point(x : T, y : T) : Point<T>
+    +Point(Pt: std::tuple<T,T>) : Point<T>
+    ..
+    +getX() const : T 
+    +getY() const : T
+    +toString() const : std::string
+    ..
+    +operator==(const Pt : Point<T>&) const : bool
+    +operator!=(const Pt : Point<T>&) const : bool
+    +operator<(const Pt : Point<T>&) const : bool
+    +operator=(const Pt : Point<T>&) : Point<T>&
+    ..
+    <<Friend>>
+    +operator<<(outstream : std::ostream&, const Pt : Point<F>&) : std::ostream&
+    ..
+    +lineDistance(const P1 : Point<T>, const P2 : Point<T>) const : T
+}
+
+class Quickhull<class T> {
+    Represents a Hull from a set of 2D points of type T
+    ==
+    -points : std::vector<Point<T> >
+    -min : Point<T>
+    -max : Point<T>
+    __
+    -Convexhull(min : Point<T>, max : Point<T>, s : int) : std::set<Point<T> >
+    - findSide(p1 : Point<T>, P2 : Point<T>, p : Point<T>) : int
+    ..
+    +Quickhull(const Pts : Point<T>, sz : unsigned int) : Quickhull<T>
+    +Hull() const : std::set<Point<T> >
+}
+
+class main <<(F, lightGreen) global static>> {
+    Client driver program - entry point
+    ==
+    -points : Point<double>
+    -points_SZ : int
+    -q : Quickhull<double>
+    -result : std::set<Point<double> >
+    --
+    +render(Pts : Point<T>, n : unsigned int, hull : std::set<Point<T> >) : void
+}
+
+main o-- Point : Points
+main o-- std::set : result
+main "1" *-- Quickhull : q
+
+Quickhull "1" *-- std::vector : points
+Quickhull o-- Point : points
+Quickhull *-- Point : min, max
+Quickhull "1" *-- std::set : Hull(), Convexhull()
+
+Point  *-- std::tuple
+Point  *-- std::string
+Point  *-- std::ostream
+
+@enduml
